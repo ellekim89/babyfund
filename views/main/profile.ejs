@@ -1,1 +1,11 @@
 <h1> PROFILE </h1>
+
+<h3> Add A Child <a href="/profile/<%= cleanUser.id %>/addChildForm"><button class="btn-sm btn-success glyphicon glyphicon-plus"></button></a> </h3>
+
+
+<% kids.forEach(function(result){ %>
+<div class="well">
+  <%= result.name %><br>
+  <%= result.birthday %>
+</div>
+<% }); %>

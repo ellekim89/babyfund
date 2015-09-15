@@ -23,6 +23,7 @@ app.use(flash());
 
 // USERS LOGGING IN
 app.use(function(req,res,next){
+	req.session.user = 1
 	if(req.session.user){
 		db.user.findById(req.session.user).then(function(user){
 			req.currentUser = user;
@@ -115,8 +116,15 @@ app.post("/register", function(req,res){
 	}
 })
 
-app.get('/profile', function(req, res){
-	res.render('main/profile');
+app.get('/profile/:id', function(req, res){
+
+	db.user.find({
+		where: {id:req.params.id}, include:[db.kid]
+	}).then(function(kid){
+	res.render('main/profile', kid.get())
+	}).catch(function(err){
+		res.send(err)
+	})
 })
 
 app.get('/child', function(req, res){
@@ -127,5 +135,20 @@ app.get('/child', function(req, res){
 app.post('/child/thankyou', function(req,res){
 	res.render('child/thankyou');
 })
+
+app.get('/profile/:id/addChildForm', function(req, res){
+	res.render('main/addChildForm')
+})
+
+app.post('/profile/:id/addChildForm', function(req, res){
+	db.kid.findOrCreate({
+		where:{user_id: req.currentUser.id,
+					 name: req.body.name,
+					 birthday: req.body.birthday
+					}
+	}).spread(function(kid, created){
+		res.redirect('/profile/'+ req.currentUser.id)
+	});
+});
 
 app.listen(3000);
