@@ -58,6 +58,27 @@ app.get('/login', function(req, res){
 	res.render('main/login');
 })
 
+app.post('/login', function(req,res){
+	db.user.authenticate(req.body.email, req.body.password, function(err,user){
+		if(err){
+			res.send(err)
+		}else if(user){
+			req.session.user = user.id;
+			req.flash('success', 'You are logged in.')
+			res.redirect('/')
+		}else{
+			req.flash('danger', 'invalid username or password');
+			res.redirect('/login')
+		}
+	})
+})
+
+app.get('/logout',function(req,res){
+  req.flash('info','You have been logged out.');
+  req.session.user = false;
+  res.redirect('/');
+});
+
 app.get('/register', function(req, res){
 	res.render('main/register');
 })
